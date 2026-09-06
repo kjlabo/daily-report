@@ -1,0 +1,7 @@
+export default function Home() {
+  return (
+    <main>
+      <h1>営業日報システム</h1>
+    </main>
+  );
+}
