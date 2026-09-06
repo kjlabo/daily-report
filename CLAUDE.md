@@ -152,3 +152,13 @@ erDiagram
 ### 3. テスト仕様書
 - テスト仕様書：[docs/test-specification.md](docs/test-specification.md)
 @docs/test-specification.md
+
+
+## 使用技術
+**言語:** TypeScript  
+**フレームワーク** Next.js(App Router)  
+**UIコンポーネント** shadcn/ui + Tailwind CSS  
+APIスキーマ定義** OpenAPI(Zodによる検証)  
+**DBスキーマ定義** Prisma.js  
+**テスト** Vitest  
+**デプロイ** Google Cloud Run  
