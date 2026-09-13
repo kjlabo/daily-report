@@ -57,21 +57,32 @@ description: Git Worktreeで作業用ブランチを分離し、内容に応じ�
 - 型チェックは `npm run typecheck` があればそれを使う。存在しない場合（package.jsonにscriptがない）は `npx tsc --noEmit` で代用する
 - テストが失敗した場合、実装とテストのどちらが正しいかをユーザーに確認してから修正する
 
-### 5. プルリクエスト作成
+### 5. package-lock.jsonのCI互換性確認
+
+- `package.json` / `package-lock.json` に変更がある場合（`npm install`で依存追加した場合など）、ローカルのnpmバージョンとCI（`.github/workflows/*.yml`の`node-version`、現在はNode 22）で使われるnpmバージョンが異なると、`npm ci`がpeer依存関係の解決差異で失敗することがある（例: Issue #1でNode 22/npm 10 vs ローカルnpm 11の差異により`Missing: typescript@5.9.3 from lock file`エラーが発生）
+- そのため、pushする前に必ずCIと同じNode版のDockerコンテナで`npm ci`が通ることを検証する
+  ```
+  docker run --rm -v <worktreeパス>:/app -w /app node:22 sh -c "npm ci && npm run lint && npm run test"
+  ```
+- 失敗する場合は、同じコンテナ内で `npm install` を実行してlockfileをCI互換の内容に再生成し、コミットに含める
+- コンテナ内でインストールした`node_modules`はLinux用ネイティブバイナリになりホスト（macOS等）では動かないため、検証後は必ずホスト上で `npm ci` を再実行してから通常通りcommit/pushする（pre-push hookのテストがホストのnode_modulesを使うため）
+
+### 6. プルリクエスト作成
 
 - 変更をコミットし、リモートにプッシュする（`.env` 等の秘密情報を含むファイルがステージされていないことを `git status` で確認する）
 - `gh pr create` コマンドでプルリクエストを作成する
 - PRタイトルは「feat: Issue #<Issue番号> [Issue内容の要約]」形式にする
 - PR本文に受け入れ条件のチェックリストと実施したテスト内容を記載し、末尾に `Closes #<Issue番号>` を入れる
+- プッシュ後、`gh pr checks <PR番号>` でCIがpassすることを確認する。failした場合は原因を調査して修正する
 
-### 6. Issueへの完了報告・ステータス更新
+### 7. Issueへの完了報告・ステータス更新
 
 - `gh issue comment <Issue番号>` で対応内容・PRリンク・受け入れ条件チェック結果・テスト結果を記載したコメントを追記する
 - 作業中に判明した注意点（環境依存の問題や回避策など）があれば、今後のためにコメントに残す
 - Issueはこの時点ではクローズせず、「レビュー待ち」であることが分かるようラベル `status: in review` を付与する（存在しなければ `gh label create "status: in review" --description "PRレビュー待ち" --color "fbca04"` で作成してから付与）
   - PR本文に `Closes #<Issue番号>` を入れてあるため、PRがマージされれば自動でIssueがクローズされる。エージェントが自らIssueをクローズしない
 
-### 7. 後処理（クリーンアップ）
+### 8. 後処理（クリーンアップ）
 
 - Worktree作成前にいた元のリポジトリルートディレクトリに戻る
 - `git worktree remove issue-<Issue番号>` でWorktreeを削除する
