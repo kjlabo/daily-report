@@ -16,7 +16,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "prisma generate"
   },
   "repository": {
     "type": "git",
@@ -31,8 +32,11 @@
   },
   "homepage": "https://github.com/kjlabo/daily-report#readme",
   "dependencies": {
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
     "@tailwindcss/postcss": "^4.3.3",
     "next": "^16.3.4",
+    "pg": "8.23.0",
     "postcss": "^8.5.28",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -42,6 +46,7 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^26.4.1",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
@@ -52,6 +57,7 @@
     "jsdom": "^30.0.1",
     "lint-staged": "^17.5.0",
     "prettier": "^3.9.6",
+    "prisma": "7.10.0",
     "typescript": "^6.0.3",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^5.0.0"

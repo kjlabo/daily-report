@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // 接続情報はPrisma 7の方式に従いprisma.config.ts（CLI用）と
+  // lib/prisma.ts（アプリ実行時、ドライバーアダプタ経由）で設定する。
+}
+
+enum EmployeeRole {
+  SALES
+  MANAGER
+  ADMIN
+}
+
+model Employee {
+  id           Int          @id @default(autoincrement())
+  name         String
+  email        String       @unique
+  passwordHash String
+  role         EmployeeRole
+  managerId    Int?
+  manager      Employee?    @relation("EmployeeManager", fields: [managerId], references: [id])
+  subordinates Employee[]   @relation("EmployeeManager")
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  dailyReports DailyReport[]
+  comments     Comment[]
+
+  @@map("employees")
+}
+
+model Customer {
+  id            Int      @id @default(autoincrement())
+  name          String
+  address       String?
+  contactPerson String?
+  phone         String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  visitRecords VisitRecord[]
+
+  @@map("customers")
+}
+
+model DailyReport {
+  id         Int      @id @default(autoincrement())
+  employeeId Int
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  reportDate DateTime @db.Date
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  visitRecords VisitRecord[]
+  problems     Problem[]
+  plans        Plan[]
+  comments     Comment[]
+
+  @@unique([employeeId, reportDate])
+  @@map("daily_reports")
+}
+
+model VisitRecord {
+  id         Int         @id @default(autoincrement())
+  reportId   Int
+  report     DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  customerId Int
+  customer   Customer    @relation(fields: [customerId], references: [id])
+  content    String
+  sortNo     Int
+  createdAt  DateTime    @default(now())
+
+  @@map("visit_records")
+}
+
+model Problem {
+  id        Int         @id @default(autoincrement())
+  reportId  Int
+  report    DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  content   String
+  sortNo    Int
+  createdAt DateTime    @default(now())
+
+  @@map("problems")
+}
+
+model Plan {
+  id        Int         @id @default(autoincrement())
+  reportId  Int
+  report    DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  content   String
+  sortNo    Int
+  createdAt DateTime    @default(now())
+
+  @@map("plans")
+}
+
+model Comment {
+  id          Int         @id @default(autoincrement())
+  reportId    Int
+  report      DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  commenterId Int
+  commenter   Employee    @relation(fields: [commenterId], references: [id])
+  content     String
+  createdAt   DateTime    @default(now())
+
+  @@map("comments")
+}

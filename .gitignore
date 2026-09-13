@@ -35,10 +35,6 @@ pnpm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma
-/prisma/*.db
-/prisma/*.db-journal
-
 # IDE
 .vscode/*
 !.vscode/extensions.json
