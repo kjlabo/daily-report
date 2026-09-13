@@ -14,4 +14,9 @@ export default defineConfig({
     // .envなしでも動くようplain参照にしている（migrate実行時は実値が必須）。
     url: process.env.DIRECT_URL,
   },
+  migrations: {
+    // Prisma 7ではシードは`prisma db seed`経由でのみ実行される
+    // （`migrate dev`/`migrate reset`による自動実行は廃止された）。
+    seed: "npx tsx prisma/seed.ts",
+  },
 });

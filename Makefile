@@ -4,7 +4,7 @@
 # データベース: Supabase (PostgreSQL)。マイグレーションはPrisma経由でこのMakefileから実行する。
 
 .PHONY: help install lint typecheck test build ci \
-	db-generate db-migrate db-deploy db-studio
+	db-generate db-migrate db-deploy db-studio db-seed
 
 help:
 	@echo "アプリケーション:"
@@ -20,6 +20,7 @@ help:
 	@echo "  make db-migrate    開発環境向けマイグレーション作成・適用（prisma migrate dev）"
 	@echo "  make db-deploy     本番/Supabase環境へのマイグレーション適用（prisma migrate deploy）"
 	@echo "  make db-studio     Prisma Studioの起動"
+	@echo "  make db-seed       テスト用アカウント・サンプルデータの投入（冪等・複数回実行可）"
 	@echo ""
 	@echo "デプロイはVercelのGit連携により push 時に自動実行されるため、本Makefileには含めない。"
 
@@ -53,3 +54,6 @@ db-deploy:
 
 db-studio:
 	npx prisma studio
+
+db-seed:
+	npm run db:seed
